@@ -68,10 +68,6 @@ if [[ "${WEN_INSTALL_SCRCPY:-1}" == "1" ]]; then
   brew_formula scrcpy
 fi
 
-if [[ "${WEN_INSTALL_CLOUDFLARED:-0}" == "1" ]]; then
-  brew_formula cloudflared
-fi
-
 if [[ ! -x "$WEN_JAVA_PATH/bin/java" ]]; then
   if command -v java >/dev/null 2>&1; then
     WEN_JAVA_PATH="$(/usr/libexec/java_home 2>/dev/null || true)"
@@ -132,4 +128,3 @@ printf '  3. 终端一启动 Appium：./scripts/start-appium.sh\n'
 printf '  4. 终端二启动 Wen：uv run wen serve --host 127.0.0.1 --port 8765\n'
 printf '  5. 浏览器打开：http://127.0.0.1:8765\n'
 printf '\n如不需要 scrcpy，可用 WEN_INSTALL_SCRCPY=0 ./scripts/setup-mac.sh 跳过。\n'
-printf '如需同时安装临时外网测试工具，可用 WEN_INSTALL_CLOUDFLARED=1 ./scripts/setup-mac.sh。\n'
