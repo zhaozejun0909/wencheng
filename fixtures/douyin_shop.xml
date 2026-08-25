@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hierarchy rotation="0">
+  <node text="抖音" class="android.widget.FrameLayout" bounds="[0,0][1080,2400]">
+    <node text="搜索" class="android.widget.TextView" bounds="[60,120][300,200]" />
+    <node text="鸭鸭童装旗舰店" class="android.widget.TextView" bounds="[60,300][700,380]" />
+    <node text="官方旗舰店" class="android.widget.TextView" bounds="[60,390][350,440]" />
+    <node text="粉丝 12.3万" class="android.widget.TextView" bounds="[60,460][320,520]" />
+    <node text="商品 36" class="android.widget.TextView" bounds="[350,460][580,520]" />
+    <node text="鸭鸭儿童羽绒服冬季保暖外套" class="android.widget.TextView" bounds="[60,650][800,730]" />
+    <node text="¥299" class="android.widget.TextView" bounds="[60,740][260,800]" />
+    <node text="已售 1.2万+" class="android.widget.TextView" bounds="[300,740][560,800]" />
+    <node text="鸭鸭童装男女童加绒卫衣" class="android.widget.TextView" bounds="[60,900][800,980]" />
+    <node text="¥129" class="android.widget.TextView" bounds="[60,990][260,1050]" />
+    <node text="已售 3680" class="android.widget.TextView" bounds="[300,990][560,1050]" />
+    <node text="儿童春秋季纯棉长袖T恤" class="android.widget.TextView" bounds="[60,1150][800,1230]" />
+    <node text="¥79.9" class="android.widget.TextView" bounds="[60,1240][260,1300]" />
+    <node text="已售 956" class="android.widget.TextView" bounds="[300,1240][560,1300]" />
+  </node>
+</hierarchy>

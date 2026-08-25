@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Test, lint and coverage caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Wen runtime data and exports
+/data/
+/outputs/
+/work/
+*.ses
+*.log
+*.pid
+nohup.out
+
+# Local editor/agent configuration
+.idea/
+.vscode/
+.codex/
+.agents/

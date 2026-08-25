@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>文成 · 数据监查</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+    body { max-width: 1080px; margin: 0 auto; padding: 28px 18px 60px; background: #f6f7f9; color: #1f2937; }
+    .card { background: #fff; border-radius: 14px; padding: 20px; margin: 16px 0; box-shadow: 0 4px 18px #0000000d; }
+    h1 { margin-bottom: 4px; } h2 { margin-top: 0; } .muted { color: #6b7280; }
+    label { display: block; margin: 10px 0 5px; font-weight: 600; }
+    input, textarea, select, button { font: inherit; padding: 9px 11px; border: 1px solid #d1d5db; border-radius: 8px; }
+    input, textarea { width: min(620px, 100%); box-sizing: border-box; }
+    textarea { display: block; resize: vertical; }
+    select { min-width: 160px; }
+    button { cursor: pointer; background: #111827; color: white; border-color: #111827; margin: 8px 6px 0 0; }
+    button.secondary { background: white; color: #111827; }
+    button.danger { background: #b91c1c; border-color: #b91c1c; }
+    pre { white-space: pre-wrap; background: #111827; color: #d1fae5; padding: 14px; border-radius: 8px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; } th, td { padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
+    .group-row { display: flex; align-items: center; gap: 14px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; margin: 10px 0; cursor: pointer; }
+    .group-row > input { flex: 0 0 auto; width: 18px; height: 18px; }
+    .group-summary { flex: 1 1 auto; min-width: 0; }
+    .group-summary strong { display: block; margin-bottom: 4px; font-size: 16px; }
+    .group-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+    .group-actions button { margin: 0; }
+    .precise-panel { margin-top: 12px; padding: 14px; border: 1px solid #dbe3ef; border-radius: 12px; background: #f8fafc; }
+    .catalog-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .catalog-toolbar button { margin-top: 0; }
+    .catalog-status { margin-bottom: 10px; }
+    .catalog-search { width: min(520px, 100%); margin-top: 10px; }
+    .catalog-picker { margin-top: 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+    .catalog-picker-header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 9px 10px; border-bottom: 1px solid #e5e7eb; }
+    .catalog-picker-header button { margin-top: 0; padding: 6px 9px; }
+    .catalog { max-height: 520px; overflow: auto; }
+    .catalog label { display: flex; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box; font-weight: 400; padding: 12px 10px; margin: 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; user-select: none; }
+    .catalog label:last-child { border-bottom: 0; }
+    .catalog input { width: auto; margin-right: 8px; }
+    .module { border-left: 4px solid #111827; padding-left: 14px; margin: 18px 0; }
+    .module h3 { margin: 0 0 8px; }
+    .module-condition { font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .warn { margin: 8px 0; padding: 10px 12px; border-radius: 8px; background: #fef2f2; color: #991b1b; white-space: pre-wrap; }
+    .result-time { color: #6b7280; margin-top: 4px; }
+    .price-value { color: #dc2626; font-weight: 700; }
+    .result-actions { margin: 6px 0 16px; }
+    .button-link { display: inline-block; padding: 9px 11px; margin: 0 8px 8px 0; border-radius: 8px; background: #111827; color: white; text-decoration: none; }
+    .button-link.secondary-link { background: white; color: #111827; border: 1px solid #d1d5db; }
+    .history-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #e5e7eb; }
+    .history-row:last-child { border-bottom: 0; }
+    .history-main { flex: 1; min-width: 0; }
+    .history-main strong { display: block; margin-bottom: 4px; }
+    .history-summary { color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .history-actions a, .history-actions button { margin: 0; padding: 6px 9px; font-size: 14px; }
+    .history-pagination { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+    .history-pagination button { margin: 0; padding: 6px 10px; }
+    .query-progress { margin: 0 0 16px; background: #f8fafc; border: 1px solid #dbe3ef; }
+    .query-progress-head { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .query-progress-list { margin-top: 10px; }
+    .progress-row { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-top: 1px solid #e5e7eb; }
+    .progress-icon { flex: 0 0 auto; width: 18px; text-align: center; }
+    .progress-detail { flex: 1; min-width: 0; }
+    .progress-detail strong { display: block; }
+    .progress-detail small { color: #6b7280; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #cbd5e1; border-top-color: #111827; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
+    .progress-row.done .progress-icon { color: #047857; }
+    .progress-row.failed .progress-icon { color: #b91c1c; }
+    .progress-row.stopped .progress-icon { color: #6b7280; }
+    button:disabled { cursor: wait; opacity: .6; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 700px) { .history-row { align-items: flex-start; flex-direction: column; gap: 6px; } }
+    dialog { width: min(900px, calc(100vw - 36px)); max-width: 900px; border: 0; border-radius: 14px; padding: 0; box-shadow: 0 18px 60px #0006; }
+    dialog::backdrop { background: #11182799; }
+    .dialog-body { padding: 20px; }
+    .dialog-body h3 { margin-top: 0; }
+    #shareLinkDialog { max-width: 620px; }
+    .field-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 5px; }
+    .field-title-row label { margin: 0; }
+    .field-title-row button { margin: 0; padding: 6px 9px; font-size: 14px; }
+    @media (max-width: 700px) {
+      .group-row { flex-wrap: wrap; }
+      .group-summary { flex-basis: calc(100% - 48px); }
+      .group-actions { width: 100%; justify-content: flex-start; }
+    }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .editor-card { border: 2px solid #111827; background: #fafafa; padding: 20px; margin: 16px 0; border-radius: 12px; }
+    .condition-actions { margin-top: 16px; }
+    .device-settings { margin-top: 18px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fafafa; }
+    .device-settings summary { cursor: pointer; padding: 12px 14px; font-weight: 600; }
+    .device-settings-body { padding: 0 14px 14px; }
+    .device-settings-body button { margin-top: 10px; }
+    .start-query { display: block; width: 100%; padding: 14px 16px; font-size: 18px; font-weight: 700; margin-top: 14px; }
+    .stop-query { display: inline-block; width: auto; padding: 9px 14px; font-size: inherit; font-weight: 600; margin: 8px 0 14px; }
+    /* Author-level display rules must not override the native hidden state. */
+    #stopQueryButton[hidden], #catalogStop[hidden] { display: none !important; }
+    .status { margin-top: 12px; padding: 10px 12px; border-radius: 8px; background: #f3f4f6; color: #4b5563; }
+    .status.error { background: #fef2f2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h1>文成 · 数据监查</h1>
+  <div class="muted">查抖音数据还是挺费劲的～</div>
+
+  <dialog id="catalogDialog">
+    <div class="dialog-body">
+      <h3>选择要跟踪的商品</h3>
+      <p class="muted">可以搜索商品名称，也可以全选当前筛选结果。勾选状态会在关闭弹窗后保留。</p>
+      <input id="catalogSearch" class="catalog-search" placeholder="按商品名称筛选" oninput="renderCatalog()" />
+      <div id="catalogPicker" class="catalog-picker">
+        <div class="catalog-picker-header">
+          <span id="catalogCount" class="muted">尚未读取商品</span>
+          <button class="secondary" onclick="selectVisibleCatalog()">全选当前列表</button>
+          <button class="secondary" onclick="clearCatalogSelection()">清空选择</button>
+        </div>
+        <div id="catalogList" class="catalog"></div>
+      </div>
+      <div class="toolbar">
+        <button onclick="closeCatalogDialog()">完成选择</button>
+        <button class="secondary" onclick="closeCatalogDialog()">关闭</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="shareLinkDialog">
+    <div class="dialog-body">
+      <h3>从分享链接提取商品 ID</h3>
+      <label for="shareLinkText">分享链接或完整分享内容</label>
+      <textarea id="shareLinkText" rows="6" placeholder="粘贴后将自动识别" onpaste="scheduleShareProductIdExtraction()"></textarea>
+      <div id="shareLinkStatus" class="status" hidden aria-live="polite"></div>
+      <div class="toolbar">
+        <button class="secondary" onclick="closeShareLinkDialog()">取消</button>
+      </div>
+    </div>
+  </dialog>
+
+  <section class="card">
+    <h2>查询条件</h2>
+    <p class="muted">按你的想法设置需要查询的商品，点击「新增查询条件」试试吧</p>
+    <div class="editor-card" id="editorCard" hidden>
+      <h2 id="editorTitle">新增查询条件</h2>
+      <input id="groupId" type="hidden" />
+      <input id="groupName" type="hidden" />
+      <label for="selectionMode">商品查询方式</label>
+      <select id="selectionMode" onchange="toggleMode()">
+        <option value="precise" selected>精准查询</option>
+        <option value="favorites">查询我收藏的商品</option>
+        <option value="range">查询店铺内的商品</option>
+      </select>
+      <div id="storeOptions">
+        <label for="storeLocatorMode">店铺定位方式</label>
+        <select id="storeLocatorMode" onchange="toggleStoreLocator()">
+          <option value="name">店铺名称</option>
+          <option value="sec_shop_id">sec_shop_id（直达）</option>
+        </select>
+        <div id="storeNameOptions">
+          <label for="storeName">店铺名称 <small style="color:#b91c1c;font-weight:400">「请注意不能写错店名，必须和抖音完全一样」</small></label>
+          <input id="storeName" placeholder="例如：鸭鸭童装官方旗舰店" />
+        </div>
+        <div id="secShopIdOptions" hidden>
+          <label for="secShopId">sec_shop_id</label>
+          <input id="secShopId" placeholder="例如：njBWlyXQ" autocomplete="off" />
+        </div>
+      </div>
+      <div id="favoritesOptions" class="precise-panel" hidden>
+        <div class="catalog-status muted">将读取账号“我的收藏”中的全部商品，并自动排除已失效、已下架或不可购买的商品。</div>
+      </div>
+      <div id="rangeOptions">
+        <label for="sortMode">排序方式</label>
+        <select id="sortMode">
+          <option value="comprehensive">综合</option>
+          <option value="sales">销量</option>
+          <option value="newest">上新</option>
+          <option value="price_asc">价格升序</option>
+          <option value="price_desc">价格降序</option>
+        </select>
+        <label for="limitCount">查询商品数量</label>
+        <input id="limitCount" type="number" min="1" max="500" value="10" />
+      </div>
+      <div id="preciseStoreOptions" class="precise-panel" hidden>
+        <div id="catalogStatus" class="catalog-status muted" aria-live="polite">请点击下方按钮拉取店铺完整商品，然后选取想要查询的商品</div>
+        <div class="toolbar">
+          <button id="catalogChoose" class="secondary" onclick="chooseCatalog()">选择商品</button>
+          <button id="catalogStop" class="secondary danger" hidden onclick="stopCatalogRead()">停止读取</button>
+        </div>
+      </div>
+      <div id="productIdOptions" class="precise-panel" hidden>
+        <div class="field-title-row">
+          <label for="productIds">商品 ID</label>
+          <button type="button" class="secondary" onclick="openShareLinkDialog()">从分享链接提取商品 ID</button>
+        </div>
+        <textarea id="productIds" rows="5" placeholder="输入多个商品 ID，可用逗号或换行分隔"></textarea>
+      </div>
+      <div class="toolbar">
+        <button onclick="saveGroup()">保存查询条件</button>
+        <button class="secondary" onclick="closeEditor()">取消</button>
+      </div>
+      <div id="output" class="status" hidden></div>
+    </div>
+    <div id="groups"></div>
+    <div class="condition-actions">
+      <button class="secondary" onclick="openNewEditor()">＋新增查询条件</button>
+    </div>
+    <div id="conditionStatus" class="status" hidden aria-live="polite"></div>
+    <button id="startQueryButton" class="start-query" onclick="runSelectedGroups()">开始查询</button>
+  </section>
+
+  <section class="card" id="resultsCard" hidden>
+    <h2>本次查询结果</h2>
+    <div id="queryProgress" class="query-progress status" hidden aria-live="polite"></div>
+    <button id="stopQueryButton" class="stop-query danger" hidden onclick="stopCurrentQuery()">停止查询</button>
+    <div id="resultActions" class="result-actions" hidden></div>
+    <div id="results"></div>
+  </section>
+
+  <section class="card" id="historyCard" hidden>
+    <h2>查询记录</h2>
+    <div id="history" class="muted">正在读取查询记录…</div>
+  </section>
+
+  <script id="initialGroups" type="application/json"></script>
+  <script>
+    const output = document.getElementById('output');
+    const editorCard = document.getElementById('editorCard');
+    const editorTitle = document.getElementById('editorTitle');
+    const queryProgress = document.getElementById('queryProgress');
+    const startQueryButton = document.getElementById('startQueryButton');
+    const stopQueryButton = document.getElementById('stopQueryButton');
+    const catalogStopButton = document.getElementById('catalogStop');
+    const deviceOutput = document.getElementById('deviceOutput');
+    const groupsEl = document.getElementById('groups');
+    const resultsCard = document.getElementById('resultsCard');
+    const historyCard = document.getElementById('historyCard');
+    const historyEl = document.getElementById('history');
+    let groups = [];
+    let catalogProducts = [];
+    let catalogComplete = false;
+    // A title alone is not a stable identity: two cards may have the same
+    // title but different prices.  The picker therefore tracks title+price.
+    let selectedCatalogKeySet = new Set();
+    let selectedGroupIdSet = new Set();
+    let historyPage = 1;
+    const historyPageSize = 5;
+    let historyCurrentItemCount = 0;
+    let activeJobId = null;
+    let catalogJobId = null;
+    let catalogReadInFlight = false;
+    let catalogCancelRequested = false;
+    let stopRequested = false;
+    let shareExtractTimer = null;
+    let shareExtractSequence = 0;
+    const stoppingJobIds = new Set();
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
+    }
+    function setEditorStatus(message, kind = 'info') {
+      output.textContent = message;
+      output.hidden = !message;
+      output.className = `status ${kind}`;
+    }
+    function setConditionStatus(message, kind = 'info') {
+      const element = document.getElementById('conditionStatus');
+      element.textContent = message;
+      element.hidden = !message;
+      element.className = `status ${kind}`;
+    }
+    function describeJobResult(result) {
+      const labels = {queued:'排队中', running:'采集中', succeeded:'已完成', failed:'失败', paused:'已暂停', stopped:'已停止'};
+      const details = [];
+      if (result.errors?.length) details.push(`错误：${result.errors.join('；')}`);
+      if (result.warnings?.length) details.push(`提示：${result.warnings.join('；')}`);
+      if (result.store_candidates?.length) details.push(`候选店铺：${result.store_candidates.join('、')}`);
+      if (result.evidence_dir) details.push(`证据目录：${result.evidence_dir}`);
+      if (!details.length) details.push(`状态：${result.state || '未返回详细状态'}`);
+      return `任务${labels[result.status] || result.status || '结束'}（${result.state || '未知阶段'}）：${details.join('；')}`;
+    }
+    function toggleMode() {
+      const mode = document.getElementById('selectionMode').value;
+      const precise = mode === 'precise';
+      const favorites = mode === 'favorites';
+      document.getElementById('storeOptions').hidden = favorites || precise;
+      document.getElementById('favoritesOptions').hidden = !favorites;
+      document.getElementById('rangeOptions').hidden = precise || favorites;
+      document.getElementById('preciseStoreOptions').hidden = true;
+      document.getElementById('productIdOptions').hidden = !precise;
+      toggleStoreLocator();
+    }
+    function toggleStoreLocator() {
+      const direct = document.getElementById('storeLocatorMode').value === 'sec_shop_id';
+      document.getElementById('storeNameOptions').hidden = direct;
+      document.getElementById('secShopIdOptions').hidden = !direct;
+    }
+    function parseProductIds() {
+      return document.getElementById('productIds').value
+        .split(/[,，\s]+/)
+        .map(value => value.trim())
+        .filter(Boolean);
+    }
+    function setShareLinkStatus(message, kind = 'info') {
+      const element = document.getElementById('shareLinkStatus');
+      element.textContent = message;
+      element.hidden = !message;
+      element.className = `status ${kind}`;
+    }
+    function openShareLinkDialog() {
+      const dialog = document.getElementById('shareLinkDialog');
+      const input = document.getElementById('shareLinkText');
+      input.value = '';
+      input.disabled = false;
+      setShareLinkStatus('');
+      dialog.showModal();
+      requestAnimationFrame(() => input.focus());
+    }
+    function closeShareLinkDialog() {
+      clearTimeout(shareExtractTimer);
+      shareExtractSequence += 1;
+      const dialog = document.getElementById('shareLinkDialog');
+      if (dialog.open) dialog.close();
+    }
+    function scheduleShareProductIdExtraction() {
+      clearTimeout(shareExtractTimer);
+      // paste 事件触发时浏览器尚未把剪贴板内容写入 textarea，下一轮再读取。
+      shareExtractTimer = setTimeout(extractProductIdFromShare, 0);
+    }
+    async function extractProductIdFromShare() {
+      const input = document.getElementById('shareLinkText');
+      const shareText = input.value.trim();
+      if (!shareText) return;
+      const sequence = ++shareExtractSequence;
+      input.disabled = true;
+      setShareLinkStatus('正在识别商品 ID…');
+      try {
+        const response = await fetch('/api/product-id/extract', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({share_text: shareText}),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.product_id) {
+          throw new Error(payload.detail || '没有提取到商品 ID。');
+        }
+        if (sequence !== shareExtractSequence) return;
+        const productIds = parseProductIds();
+        if (!productIds.includes(payload.product_id)) productIds.push(payload.product_id);
+        document.getElementById('productIds').value = productIds.join('\n');
+        setEditorStatus(`已提取商品 ID：${payload.product_id}`);
+        closeShareLinkDialog();
+      } catch (error) {
+        if (sequence !== shareExtractSequence) return;
+        input.disabled = false;
+        setShareLinkStatus(error.message || '分享链接识别失败，请重试。', 'error');
+        input.focus();
+      }
+    }
+    function newGroup() {
+      document.getElementById('groupId').value = '';
+      document.getElementById('groupName').value = '';
+      document.getElementById('storeName').value = '';
+      document.getElementById('storeLocatorMode').value = 'name';
+      document.getElementById('secShopId').value = '';
+      document.getElementById('selectionMode').value = 'precise';
+      document.getElementById('productIds').value = '';
+      document.getElementById('sortMode').value = 'comprehensive';
+      document.getElementById('limitCount').value = 10;
+      catalogProducts = [];
+      catalogComplete = false;
+      document.getElementById('catalogList').hidden = true;
+      document.getElementById('catalogList').innerHTML = '';
+      document.getElementById('catalogPicker').hidden = true;
+      document.getElementById('catalogSearch').value = '';
+      document.getElementById('catalogSearch').hidden = true;
+      selectedCatalogKeySet = new Set();
+      closeCatalogDialog();
+      document.getElementById('catalogStatus').textContent = '请点击下方按钮拉取店铺完整商品，然后选取想要查询的商品';
+      const catalogChoose = document.getElementById('catalogChoose');
+      catalogChoose.disabled = false;
+      catalogChoose.textContent = '选择商品';
+      catalogStopButton.hidden = true;
+      catalogStopButton.disabled = false;
+      catalogStopButton.textContent = '停止读取';
+      setEditorStatus('');
+      toggleMode();
+    }
+    function openNewEditor() {
+      if (catalogReadInFlight) {
+        setConditionStatus('商品目录读取正在停止，请稍候…');
+        return;
+      }
+      setConditionStatus('');
+      newGroup();
+      editorTitle.textContent = '新增查询条件';
+      editorCard.hidden = false;
+      editorCard.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    function closeEditor() {
+      const catalogStillRunning = catalogReadInFlight || Boolean(catalogJobId);
+      if (catalogStillRunning) {
+        catalogCancelRequested = true;
+        setConditionStatus('已取消新增，正在停止商品目录读取…');
+        void stopCatalogRead();
+      } else {
+        setConditionStatus('');
+      }
+      editorCard.hidden = true;
+      newGroup();
+    }
+    function editGroup(group) {
+      document.getElementById('groupId').value = group.id;
+      document.getElementById('groupName').value = group.name;
+      document.getElementById('storeName').value = group.store_name || '';
+      document.getElementById('storeLocatorMode').value = group.store_locator_mode || 'name';
+      document.getElementById('secShopId').value = group.sec_shop_id || '';
+      document.getElementById('selectionMode').value = group.selection_mode;
+      document.getElementById('productIds').value = (group.product_ids || []).join(', ');
+      document.getElementById('sortMode').value = group.sort_mode;
+      document.getElementById('limitCount').value = group.limit_count;
+      const savedSelections = group.selected_products?.length
+        ? group.selected_products
+        : (group.selected_product_titles || []).map(title => ({title, price: null}));
+      catalogProducts = savedSelections.map((selection, index) => ({...selection, __catalogIndex: index}));
+      // Saved conditions only contain selected titles; the next click refreshes
+      // the complete store catalog before showing the picker.
+      catalogComplete = false;
+      renderCatalog(savedSelections);
+      document.getElementById('catalogStatus').textContent = catalogProducts.length
+        ? `已选择 ${selectedCatalogKeySet.size} 个商品，总共 ${catalogProducts.length} 个商品`
+        : '请点击下方按钮拉取店铺完整商品，然后选取想要查询的商品';
+      toggleMode();
+      editorTitle.textContent = '编辑查询条件';
+      editorCard.hidden = false;
+      editorCard.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    function editGroupById(id) {
+      const group = groups.find(item => item.id === id);
+      if (group) editGroup(group);
+    }
+    function rememberSelectedGroups() {
+      selectedGroupIdSet = new Set(
+        [...document.querySelectorAll('.run-group:checked')].map(input => input.value)
+      );
+    }
+    function toggleGroupCard(event, row) {
+      // The whole saved-condition card is selectable, but its action buttons
+      // and the checkbox itself keep their native, independent behavior.
+      if (event.target?.closest('button, a, input')) return;
+      event.preventDefault();
+      const input = row.querySelector('.run-group');
+      if (!input) return;
+      input.checked = !input.checked;
+      input.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+    function renderGroups() {
+      // Query conditions are embedded in the initial HTML response and rendered
+      // once. There is deliberately no second asynchronous refresh that could
+      // redraw the cards and reset a user's current selection.
+      rememberSelectedGroups();
+      groupsEl.innerHTML = groups.length ? groups.map(group => {
+        const productIdMode = group.selection_mode === 'precise';
+        const storeLabel = group.store_locator_mode === 'sec_shop_id'
+          ? `sec_shop_id：${escapeHtml(group.sec_shop_id || '')}`
+          : `店铺：${escapeHtml(group.store_name || '')}`;
+        const summary = group.selection_mode === 'favorites'
+          ? '查询范围：我的收藏 · 收藏商品'
+          : productIdMode
+          ? `商品 ID 精准查询 · 已填 ${(group.product_ids || []).length} 个`
+          : `${storeLabel} · 查询店铺内的商品 · ${escapeHtml(sortLabel(group.sort_mode))} · 最多 ${group.limit_count} 条`;
+        return `
+        <div class="group-row" onclick="toggleGroupCard(event, this)">
+          <input type="checkbox" class="run-group" aria-label="选择 ${escapeHtml(group.name)}" value="${escapeHtml(group.id)}" onchange="rememberSelectedGroups()" ${selectedGroupIdSet.has(group.id) ? 'checked' : ''} />
+          <div class="group-summary">
+            <strong>${escapeHtml(group.name)}</strong>
+            <div class="muted">${summary}</div>
+          </div>
+          <div class="group-actions">
+            <button class="secondary" onclick="editGroupById('${escapeHtml(group.id)}')">编辑</button>
+            <button class="secondary" onclick="renameGroupById('${escapeHtml(group.id)}')">重命名</button>
+            <button class="danger" onclick="deleteGroup('${escapeHtml(group.id)}')">删除</button>
+          </div>
+      </div>`;
+      }).join('') : '';
+    }
+    function loadGroups() {
+      const initial = document.getElementById('initialGroups').textContent.trim();
+      if (!initial) {
+        groups = [];
+        renderGroups();
+        return;
+      }
+      try {
+        groups = JSON.parse(initial);
+        renderGroups();
+      } catch (error) {
+        groups = [];
+        groupsEl.innerHTML = '<p class="muted">查询条件读取失败，请刷新重试。</p>';
+        console.warn('首屏查询条件解析失败', error);
+      }
+    }
+    async function refreshGroups() {
+      try {
+        const response = await fetch('/api/query-groups');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        groups = await response.json();
+        renderGroups();
+      } catch (error) {
+        setConditionStatus('查询条件已保存，但列表刷新失败，请刷新页面重试。', 'error');
+        console.warn('查询条件刷新失败', error);
+      }
+    }
+    async function loadHistory(page = historyPage) {
+      try {
+        const response = await fetch(`/api/query-runs?page=${page}&page_size=${historyPageSize}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        const jobs = Array.isArray(payload) ? payload : (payload.items || []);
+        if (!jobs.length) {
+          historyCurrentItemCount = 0;
+          historyEl.innerHTML = '';
+          historyCard.hidden = true;
+          return;
+        }
+        historyCurrentItemCount = jobs.length;
+        historyCard.hidden = false;
+        historyPage = Number(payload.page || page);
+        const total = Number(payload.total ?? jobs.length);
+        const pageCount = Math.max(1, Math.ceil(total / historyPageSize));
+        const rows = jobs.map(item => {
+          const jobIds = item.job_ids || (item.groups || []).map(group => group.job_id);
+          const detailHref = `/api/exports/view?job_ids=${encodeURIComponent(jobIds.join(','))}`;
+          const xlsxHref = `/api/exports/xlsx?job_ids=${encodeURIComponent(jobIds.join(','))}`;
+          const runGroups = item.groups || [];
+          const firstConditionName = runGroups[0]?.query_group_name || '未命名查询条件';
+          const conditionSummary = runGroups.length > 1
+            ? `${firstConditionName} 等 ${runGroups.length} 个查询条件`
+            : firstConditionName;
+          const knownProductGroups = runGroups.filter(group => group.product_count != null);
+          const productCount = knownProductGroups.reduce((sum, group) => sum + Number(group.product_count || 0), 0);
+          const productSummary = knownProductGroups.length ? ` · ${productCount} 个商品` : '';
+          const warningCount = runGroups.reduce((sum, group) => sum + Number(group.warning_count || 0), 0);
+          const warningSummary = warningCount ? ` · ${warningCount} 个异常` : '';
+          const statusSummary = ({succeeded:'成功', failed:'失败', stopped:'已停止', running:'查询中'})[item.status] || item.status;
+          const actions = item.finished_at
+            ? `<a class="button-link secondary-link" href="${detailHref}" target="_blank" rel="noopener">查看结果</a><a class="button-link secondary-link" href="${xlsxHref}">下载 XLSX</a><button class="danger" data-run-id="${escapeHtml(item.id)}" onclick="deleteHistoryRun(this.dataset.runId, this)">删除</button>`
+            : '<span class="muted">任务进行中</span>';
+          const summary = `${conditionSummary}${productSummary} · ${statusSummary}${warningSummary}`;
+          return `<div class="history-row"><div class="history-main"><strong>${escapeHtml(formatHistoryTime(item.finished_at || item.started_at))}</strong><div class="history-summary" title="${escapeHtml(summary)}">${escapeHtml(summary)}</div></div><div class="history-actions">${actions}</div></div>`;
+        }).join('');
+        const pager = total > historyPageSize
+          ? `<div class="history-pagination"><button class="secondary" onclick="loadHistory(${Math.max(1, historyPage - 1)})" ${historyPage <= 1 ? 'disabled' : ''}>上一页</button><span class="muted">第 ${historyPage} / ${pageCount} 页 · 共 ${total} 条</span><button class="secondary" onclick="loadHistory(${Math.min(pageCount, historyPage + 1)})" ${historyPage >= pageCount ? 'disabled' : ''}>下一页</button></div>`
+          : '';
+        historyEl.innerHTML = rows + pager;
+      } catch (error) {
+        historyCard.hidden = false;
+        historyEl.textContent = '查询记录读取失败，请刷新重试。';
+        console.warn('查询记录读取失败', error);
+      }
+    }
+    async function deleteHistoryRun(runId, button) {
+      if (!confirm('确定删除这条查询记录吗？删除后无法恢复。')) return;
+      button.disabled = true;
+      button.textContent = '删除中…';
+      try {
+        const response = await fetch('/api/query-runs/' + encodeURIComponent(runId), {method: 'DELETE'});
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.detail || `删除失败（${response.status}）`);
+        }
+        if (historyCurrentItemCount === 1 && historyPage > 1) historyPage -= 1;
+        await loadHistory(historyPage);
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = '删除';
+        alert(error.message);
+      }
+    }
+    function sortLabel(value) {
+      return ({comprehensive:'综合', sales:'销量', newest:'上新', price_asc:'价格升序', price_desc:'价格降序'})[value] || value;
+    }
+    function normalizeProductTitle(value) {
+      return String(value ?? '').replace(/[\u200b\u200c\u200d\ufeff\s]+/g, '').trim();
+    }
+    function catalogProductKey(product, index = null) {
+      const price = product.price == null || product.price === '' ? '' : Number(product.price).toFixed(2);
+      const occurrence = product.__catalogIndex ?? index ?? 0;
+      return `${normalizeProductTitle(product.title)}@@${price}@@${occurrence}`;
+    }
+    function selectedCatalogProducts() {
+      return catalogProducts
+        .filter(product => selectedCatalogKeySet.has(catalogProductKey(product)))
+        .map(product => ({title: product.title, price: product.price == null ? null : Number(product.price)}));
+    }
+    function selectedCatalogTitles() {
+      return selectedCatalogProducts().map(product => product.title);
+    }
+    function openCatalogDialog() {
+      renderCatalog();
+      document.getElementById('catalogDialog').showModal();
+    }
+    function closeCatalogDialog() {
+      const dialog = document.getElementById('catalogDialog');
+      if (dialog.open) dialog.close();
+      if (catalogProducts.length) {
+        document.getElementById('catalogStatus').textContent = `已选择 ${selectedCatalogKeySet.size} 个商品，总共 ${catalogProducts.length} 个商品`;
+      }
+    }
+    function renderCatalog(selected = null) {
+      const list = document.getElementById('catalogList');
+      if (selected !== null) {
+        const remaining = selected.map(item => typeof item === 'string' ? {title: item, price: null} : item);
+        selectedCatalogKeySet = new Set();
+        catalogProducts.forEach(product => {
+          const matchIndex = remaining.findIndex(saved =>
+            normalizeProductTitle(saved.title) === normalizeProductTitle(product.title)
+            && (saved.price == null || Number(saved.price) === Number(product.price))
+          );
+          if (matchIndex >= 0) {
+            selectedCatalogKeySet.add(catalogProductKey(product));
+            remaining.splice(matchIndex, 1);
+          }
+        });
+      }
+      const picker = document.getElementById('catalogPicker');
+      const search = document.getElementById('catalogSearch');
+      if (!catalogProducts.length) {
+        list.hidden = true;
+        picker.hidden = true;
+        search.hidden = true;
+        return;
+      }
+      list.hidden = false;
+      search.hidden = false;
+      picker.hidden = false;
+      const keyword = search.value.trim().toLowerCase();
+      const visibleProducts = keyword
+        ? catalogProducts.filter(product => product.title.toLowerCase().includes(keyword))
+        : catalogProducts;
+      list.innerHTML = visibleProducts.length ? visibleProducts.map(product => `
+        <label onclick="toggleCatalogCard(event, this)"><input type="checkbox" value="${escapeHtml(catalogProductKey(product))}" onchange="toggleCatalogProduct(this)" ${selectedCatalogKeySet.has(catalogProductKey(product)) ? 'checked' : ''} />
+          ${escapeHtml(product.title)} · <span class="price-value">¥${escapeHtml(product.price ?? '—')}</span> · 销量 ${escapeHtml(product.displayed_sales_raw || product.displayed_sales || '—')}</label>`).join('') : '<p class="muted" style="padding:10px">没有匹配的商品。</p>';
+      document.getElementById('catalogCount').textContent = `显示 ${visibleProducts.length} / 共 ${catalogProducts.length} 条 · 已选 ${selectedCatalogKeySet.size} 条`;
+    }
+    function toggleCatalogProduct(input) {
+      if (input.checked) selectedCatalogKeySet.add(input.value);
+      else selectedCatalogKeySet.delete(input.value);
+      renderCatalog();
+    }
+    function toggleCatalogCard(event, label) {
+      if (event.target && event.target.tagName === 'INPUT') return;
+      event.preventDefault();
+      const input = label.querySelector('input[type="checkbox"]');
+      if (!input) return;
+      input.checked = !input.checked;
+      input.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+    function selectVisibleCatalog() {
+      const keyword = document.getElementById('catalogSearch').value.trim().toLowerCase();
+      catalogProducts.filter(product => !keyword || product.title.toLowerCase().includes(keyword)).forEach(product => selectedCatalogKeySet.add(catalogProductKey(product)));
+      renderCatalog();
+    }
+    function clearCatalogSelection() {
+      selectedCatalogKeySet.clear();
+      renderCatalog();
+    }
+    async function renameGroupById(id) {
+      const group = groups.find(item => item.id === id);
+      if (!group) return;
+      const nextName = window.prompt('请输入新的查询条件名称', group.name);
+      if (nextName === null) return;
+      const name = nextName.trim();
+      if (!name) { setEditorStatus('名称不能为空。', 'error'); return; }
+      const response = await fetch('/api/query-groups/' + encodeURIComponent(id) + '/name', {
+        method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name})
+      });
+      if (response.ok) await refreshGroups();
+      else setEditorStatus('重命名失败，请稍后重试。', 'error');
+    }
+    async function saveGroup() {
+      const name = document.getElementById('groupName').value.trim();
+      const storeName = document.getElementById('storeName').value.trim();
+      const storeLocatorMode = document.getElementById('storeLocatorMode').value;
+      const secShopId = document.getElementById('secShopId').value.trim();
+      const mode = document.getElementById('selectionMode').value;
+      const favorites = mode === 'favorites';
+      const precise = mode === 'precise';
+      const productIds = precise ? parseProductIds() : [];
+      if (!favorites && !precise && storeLocatorMode === 'name' && !storeName) {
+        setEditorStatus('请填写店铺名称。', 'error'); return;
+      }
+      if (!favorites && !precise && storeLocatorMode === 'sec_shop_id' && !secShopId) {
+        setEditorStatus('请填写 sec_shop_id。', 'error'); return;
+      }
+      if (precise && !productIds.length) {
+        setEditorStatus('精准查询至少要填写一个商品 ID。', 'error'); return;
+      }
+      const invalidProductIds = productIds.filter(value => !/^\d{6,30}$/.test(value));
+      if (invalidProductIds.length) {
+        setEditorStatus(`商品 ID 只能包含数字，请检查：${invalidProductIds.join('、')}`, 'error'); return;
+      }
+      const body = {
+        name: name || null,
+        store_name: favorites || precise || storeLocatorMode === 'sec_shop_id' ? null : storeName,
+        store_locator_mode: precise || favorites ? 'name' : storeLocatorMode,
+        sec_shop_id: !favorites && !precise && storeLocatorMode === 'sec_shop_id' ? secShopId : null,
+        selection_mode: mode,
+        precise_query_mode: precise ? 'product_ids' : 'store',
+        product_ids: productIds,
+        sort_mode: precise || favorites ? 'comprehensive' : document.getElementById('sortMode').value,
+        limit_count: Number(document.getElementById('limitCount').value || 10),
+        selected_product_titles: [],
+        selected_products: [],
+      };
+      const id = document.getElementById('groupId').value;
+      const response = await fetch(id ? '/api/query-groups/' + encodeURIComponent(id) : '/api/query-groups', {
+        method: id ? 'PUT' : 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+      });
+      const result = await response.json();
+      if (response.ok) { await refreshGroups(); closeEditor(); }
+      else setEditorStatus(result.detail || '保存查询条件失败。', 'error');
+    }
+    async function deleteGroup(id) {
+      if (!confirm('确定删除这个查询条件吗？')) return;
+      await fetch('/api/query-groups/' + encodeURIComponent(id), {method: 'DELETE'});
+      await refreshGroups();
+    }
+    function setCatalogButtonLoading(loading) {
+      const button = document.getElementById('catalogChoose');
+      button.disabled = loading;
+      button.textContent = loading ? '正在查询商品…' : '选择商品';
+    }
+    async function chooseCatalog() {
+      if (catalogProducts.length && catalogComplete) {
+        openCatalogDialog();
+        return;
+      }
+      await discoverCatalog();
+    }
+    async function discoverCatalog() {
+      const storeName = document.getElementById('storeName').value.trim();
+      const storeLocatorMode = document.getElementById('storeLocatorMode').value;
+      const secShopId = document.getElementById('secShopId').value.trim();
+      const catalogStatus = document.getElementById('catalogStatus');
+      if (storeLocatorMode === 'name' && !storeName) {
+        catalogStatus.textContent = '请先填写店铺名称，再选择商品。';
+        setEditorStatus('请填写店铺名称。', 'error');
+        return;
+      }
+      if (storeLocatorMode === 'sec_shop_id' && !secShopId) {
+        catalogStatus.textContent = '请先填写 sec_shop_id，再选择商品。';
+        setEditorStatus('请填写 sec_shop_id。', 'error');
+        return;
+      }
+      catalogReadInFlight = true;
+      catalogCancelRequested = false;
+      setCatalogButtonLoading(true);
+      catalogStatus.textContent = '正在查询店铺完整商品，请稍候…';
+      setEditorStatus('正在查询商品目录，请稍候，完成后会打开选择窗口…');
+      try {
+        const response = await fetch('/api/collect', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+          keyword: storeLocatorMode === 'sec_shop_id' ? secShopId : storeName,
+          store_name: storeLocatorMode === 'name' ? storeName : null,
+          store_locator_mode: storeLocatorMode,
+          sec_shop_id: storeLocatorMode === 'sec_shop_id' ? secShopId : null,
+          max_products: 500,
+          selection_mode: 'precise_catalog', sort_mode: 'comprehensive'
+        })});
+        const created = await response.json().catch(() => ({}));
+        if (!response.ok || !created.job_id) {
+          throw new Error(created.detail || '商品目录读取任务创建失败。');
+        }
+        catalogJobId = created.job_id;
+        showCatalogStopButton();
+        if (catalogCancelRequested) await stopCatalogRead();
+        const result = await pollJob(created.job_id);
+        catalogJobId = null;
+        hideCatalogStopButton();
+        // The user may cancel while the stop request is racing with the
+        // final device read.  Even if the backend has already completed the
+        // job (and answers 409 to the stop request), cancellation must not
+        // reopen the picker behind the user's back or turn into a saved
+        // condition accidentally.
+        if (catalogCancelRequested) {
+          catalogStatus.textContent = result?.status === 'succeeded'
+            ? '已取消新增，商品目录读取已完成但未打开选择窗口。'
+            : '商品目录读取已停止，任务和现场证据已删除。';
+          setConditionStatus('已取消新增，商品目录读取未保存查询条件。', 'info');
+          return;
+        }
+        if (result?.status === 'stopped') {
+          catalogStatus.textContent = '商品目录读取已停止，任务和现场证据已删除。';
+          setConditionStatus('商品目录读取已停止，未保存查询条件。', 'info');
+          return;
+        }
+        if (result && result.status === 'succeeded') {
+          const previousSelected = selectedCatalogProducts();
+          catalogProducts = (result.products || []).map((product, index) => ({...product, __catalogIndex: index}));
+          catalogComplete = true;
+          selectedCatalogKeySet = new Set();
+          const remainingSelected = [...previousSelected];
+          catalogProducts.forEach(product => {
+            const matchIndex = remainingSelected.findIndex(saved =>
+              normalizeProductTitle(saved.title) === normalizeProductTitle(product.title)
+              && (saved.price == null || Number(saved.price) === Number(product.price))
+            );
+            if (matchIndex >= 0) {
+              selectedCatalogKeySet.add(catalogProductKey(product));
+              remainingSelected.splice(matchIndex, 1);
+            }
+          });
+          renderCatalog();
+          catalogStatus.textContent = `已选择 ${selectedCatalogKeySet.size} 个商品，总共 ${catalogProducts.length} 个商品`;
+          setEditorStatus(catalogProducts.length ? '商品目录已读取，请勾选需要跟踪的商品。' : '商品目录读取完成，但没有发现商品。');
+          if (catalogProducts.length) openCatalogDialog();
+        } else {
+          const diagnostic = result ? describeJobResult(result) : '任务未返回结果，请检查服务是否仍在运行。';
+          catalogStatus.textContent = result?.evidence_dir
+            ? `读取失败，证据目录：${result.evidence_dir}`
+            : '读取失败，未返回证据目录';
+          setEditorStatus(diagnostic, 'error');
+        }
+      } catch (error) {
+        catalogStatus.textContent = '读取失败，请检查设备和登录状态后重试。';
+        setEditorStatus(`商品目录读取失败：${error.message || error}`, 'error');
+      } finally {
+        catalogReadInFlight = false;
+        catalogJobId = null;
+        catalogCancelRequested = false;
+        hideCatalogStopButton();
+        setCatalogButtonLoading(false);
+      }
+    }
+    async function postGroup(group, queryRunId) {
+      const productIdMode = group.selection_mode === 'precise';
+      const favorites = group.selection_mode === 'favorites';
+      return (await fetch('/api/collect', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+        keyword: favorites ? '我的收藏' : productIdMode ? '商品 ID 查询' : (group.sec_shop_id || group.store_name),
+        store_name: favorites || productIdMode ? null : group.store_name,
+        store_locator_mode: favorites || productIdMode ? 'name' : (group.store_locator_mode || 'name'),
+        sec_shop_id: favorites || productIdMode ? null : group.sec_shop_id,
+        precise_query_mode: productIdMode ? 'product_ids' : 'store',
+        product_ids: productIdMode ? (group.product_ids || []) : [],
+        max_products: group.selection_mode === 'precise' || favorites ? 500 : group.limit_count,
+        product_titles: [],
+        product_selections: [],
+        selection_mode: group.selection_mode, sort_mode: group.sort_mode, query_group_id: group.id, query_group_name: group.name,
+        query_run_id: queryRunId,
+      })})).json();
+    }
+    async function runSelectedGroups() {
+      const ids = [...document.querySelectorAll('.run-group:checked')].map(input => input.value);
+      const selected = groups.filter(group => ids.includes(group.id));
+      if (!selected.length) {
+        resultsCard.hidden = false;
+        queryProgress.hidden = false;
+        queryProgress.innerHTML = '<div class="query-progress-head">请先勾选至少一个查询条件。</div>';
+        return;
+      }
+      resultsCard.hidden = false;
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('resultActions').hidden = true;
+      document.getElementById('resultActions').innerHTML = '';
+      startQueryButton.disabled = true;
+      stopRequested = false;
+      showStopButton();
+      beginQueryProgress(selected);
+      const queryRunId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      const jobIds = [];
+      try {
+        for (const group of selected) {
+          if (stopRequested) break;
+          updateProgress(group, {status: 'queued', state: 'queued'});
+          const created = await postGroup(group, queryRunId);
+          if (!created.job_id) {
+            updateProgress(group, {status: 'failed', state: 'failed', errors: [created.detail || '任务创建失败']});
+            continue;
+          }
+          activeJobId = created.job_id;
+          if (stopRequested) {
+            stoppingJobIds.add(created.job_id);
+            await requestStop(created.job_id);
+          }
+          const result = await pollJob(created.job_id, group);
+          activeJobId = null;
+          if (result?.status === 'stopped') break;
+          jobIds.push(created.job_id);
+          renderModule(group, result);
+        }
+        renderResultActions(jobIds);
+        await loadHistory(1);
+        finishQueryProgress(selected.length, jobIds.length, stopRequested);
+      } finally {
+        activeJobId = null;
+        hideStopButton();
+        stopRequested = false;
+        startQueryButton.disabled = false;
+      }
+    }
+    const stageLabels = {
+      queued: '任务已创建，等待执行',
+      device_check: '检查设备连接',
+      app_start: '启动抖音',
+      page_capture: '读取当前页面',
+      search_or_extract: '搜索店铺并进入店铺页',
+      store_direct: '按 sec_shop_id 直达店铺',
+      product_detail: '按商品 ID 读取详情页',
+      favorites_open: '打开我的收藏商品',
+      product_list: '读取商品列表并采集商品信息',
+      completed: '采集完成',
+      login_required: '需要登录',
+      risk_control: '触发风控，需要人工处理',
+      store_selection_required: '店铺未能严格命中',
+      stopped: '用户已停止，任务已删除',
+      failed: '执行失败',
+    };
+    const statusLabels = {queued: '排队中', running: '采集中', succeeded: '已完成', failed: '失败', paused: '已暂停', stopped: '已停止'};
+    function progressText(result) {
+      const status = statusLabels[result?.status] || result?.status || '处理中';
+      const stage = stageLabels[result?.state] || result?.state || '处理中';
+      const details = [...(result?.errors || []), ...(result?.warnings || [])];
+      return `${status} · ${stage}${details.length ? `：${details[0]}` : ''}`;
+    }
+    function beginQueryProgress(selected) {
+      queryProgress.hidden = false;
+      queryProgress.innerHTML = `<div class="query-progress-head"><span class="spinner" aria-hidden="true"></span><span>正在查询（${selected.length} 条条件，设备依次执行）</span></div><div class="query-progress-list">${selected.map(group => `<div id="progress-${escapeHtml(group.id)}" class="progress-row"><span class="progress-icon"><span class="spinner" aria-hidden="true"></span></span><div class="progress-detail"><strong>${escapeHtml(group.name)}</strong><small>等待创建任务</small></div></div>`).join('')}</div>`;
+    }
+    function updateProgress(group, result) {
+      const row = document.getElementById(`progress-${group.id}`);
+      if (!row) return;
+      const terminal = !['queued', 'running'].includes(result?.status);
+      row.className = `progress-row ${terminal ? (result.status === 'succeeded' ? 'done' : (result.status === 'stopped' ? 'stopped' : 'failed')) : ''}`;
+      row.querySelector('.progress-icon').innerHTML = terminal
+        ? (result.status === 'succeeded' ? '✓' : (result.status === 'stopped' ? '■' : '×'))
+        : '<span class="spinner" aria-hidden="true"></span>';
+      row.querySelector('.progress-detail small').textContent = progressText(result);
+    }
+    function finishQueryProgress(total, createdCount, stopped = false) {
+      const head = queryProgress.querySelector('.query-progress-head');
+      if (head) head.innerHTML = stopped
+        ? '<span aria-hidden="true">■</span><span>本次查询已停止，停止任务和现场证据已删除</span>'
+        : `<span aria-hidden="true">✓</span><span>本次查询完成：${createdCount} / ${total} 条条件已执行</span>`;
+      // Terminal state owns the button lifecycle; do this here as well as in
+      // runSelectedGroups.finally so an error while refreshing history cannot
+      // leave a stale “停止查询” button on screen.
+      hideStopButton();
+    }
+    function showStopButton() {
+      stopQueryButton.hidden = false;
+      stopQueryButton.disabled = false;
+      stopQueryButton.textContent = '停止查询';
+    }
+    function hideStopButton() {
+      stopQueryButton.hidden = true;
+      stopQueryButton.disabled = false;
+      stopQueryButton.textContent = '停止查询';
+    }
+    function showCatalogStopButton() {
+      catalogStopButton.hidden = false;
+      catalogStopButton.disabled = false;
+      catalogStopButton.textContent = '停止读取';
+    }
+    function hideCatalogStopButton() {
+      catalogStopButton.hidden = true;
+      catalogStopButton.disabled = false;
+      catalogStopButton.textContent = '停止读取';
+    }
+    async function requestStop(jobId) {
+      if (!jobId) return;
+      stoppingJobIds.add(jobId);
+      try {
+        const response = await fetch('/api/jobs/' + encodeURIComponent(jobId) + '/stop', {method: 'POST'});
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.detail || `停止请求失败（${response.status}）`);
+        }
+        return await response.json();
+      } catch (error) {
+        stoppingJobIds.delete(jobId);
+        throw error;
+      }
+    }
+    async function stopCatalogRead() {
+      catalogCancelRequested = true;
+      if (!catalogJobId) return;
+      catalogStopButton.disabled = true;
+      catalogStopButton.textContent = '正在停止…';
+      document.getElementById('catalogStatus').textContent = '正在停止商品目录读取，请稍候…';
+      try {
+        await requestStop(catalogJobId);
+      } catch (error) {
+        catalogCancelRequested = false;
+        catalogStopButton.disabled = false;
+        catalogStopButton.textContent = '停止读取';
+        document.getElementById('catalogStatus').textContent = `停止失败：${error.message}`;
+      }
+    }
+    async function stopCurrentQuery() {
+      if (stopRequested) return;
+      stopRequested = true;
+      stopQueryButton.disabled = true;
+      stopQueryButton.textContent = '正在停止…';
+      if (activeJobId) {
+        try {
+          await requestStop(activeJobId);
+          setEditorStatus('查询已停止，正在刷新状态…');
+        } catch (error) {
+          stopRequested = false;
+          stopQueryButton.disabled = false;
+          stopQueryButton.textContent = '停止查询';
+          setEditorStatus(`停止失败：${error.message}`, 'error');
+        }
+      } else {
+        setEditorStatus('已请求停止，等待当前任务退出…');
+      }
+    }
+    async function pollJob(jobId, group = null) {
+      let stopWaitStartedAt = null;
+      for (;;) {
+        const response = await fetch('/api/jobs/' + encodeURIComponent(jobId));
+        if (!response.ok) {
+          if (stoppingJobIds.has(jobId)) {
+            stoppingJobIds.delete(jobId);
+            return {status: 'stopped', state: 'deleted'};
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
+        }
+        const result = await response.json();
+        if (stoppingJobIds.has(jobId)) {
+          stopWaitStartedAt ||= Date.now();
+          if (Date.now() - stopWaitStartedAt > 5000) {
+            stoppingJobIds.delete(jobId);
+            return {status: 'failed', state: 'stop_failed', errors: ['停止请求已返回，但任务仍然存在，请再次停止。']};
+          }
+          if (group) updateProgress(group, {status: 'stopped', state: 'stopping'});
+          await new Promise(resolve => setTimeout(resolve, 500));
+          continue;
+        }
+        if (group) updateProgress(group, result);
+        else {
+          const message = `商品目录任务：${progressText(result)}`;
+          setEditorStatus(message, result.status === 'failed' ? 'error' : 'info');
+          const catalogStatus = document.getElementById('catalogStatus');
+          if (catalogStatus) catalogStatus.textContent = message;
+        }
+        if (!['queued', 'running'].includes(result.status)) return result;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    function renderModule(group, result) {
+      const productIdMode = group.selection_mode === 'precise';
+      const scopeName = group.selection_mode === 'favorites'
+        ? '我的收藏'
+        : productIdMode
+        ? '商品 ID 查询'
+        : (result?.store?.name || group.store_name || group.sec_shop_id || '店铺查询');
+      if (!result) {
+        document.getElementById('results').insertAdjacentHTML('beforeend', `<div class="module"><h3>${escapeHtml(scopeName)}</h3><div class="module-condition">查询条件：${escapeHtml(group.name)}</div><p class="warn">任务没有返回结果。</p></div>`);
+        return;
+      }
+      const products = result.products || [];
+      const diagnostics = [
+        ...(result.errors || []).map(value => `错误：${value}`),
+        ...(result.warnings || []).map(value => `提示：${value}`),
+      ];
+      if (result.missing_product_titles?.length) {
+        diagnostics.push(`精准未命中商品（可能已改名或下架）：${result.missing_product_titles.join('、')}`);
+      }
+      if (result.invalid_favorite_titles?.length) {
+        diagnostics.push(`收藏失效商品（已自动排除）：${result.invalid_favorite_titles.join('、')}`);
+      }
+      const diagnosticsHtml = diagnostics.map(value => `<p class="warn">${escapeHtml(value)}</p>`).join('');
+      const collectedAt = formatChinaTime(result.finished_at);
+      const html = `<div class="module"><h3>${escapeHtml(scopeName)}</h3>
+        <div class="module-condition">查询条件：${escapeHtml(group.name)}</div>
+        <div class="muted">状态：${escapeHtml(result.status)} · ${escapeHtml(result.state)} · 商品数：${products.length}</div>
+        <div class="result-time">采集时间：${escapeHtml(collectedAt)}</div>
+        ${diagnosticsHtml}</div>`;
+      document.getElementById('results').insertAdjacentHTML('beforeend', html);
+    }
+    function formatChinaTime(value) {
+      if (!value) return '—';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return String(value);
+      return new Intl.DateTimeFormat('zh-CN', {
+        timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+      }).format(parsed).replace(/\//g, '-');
+    }
+    function formatHistoryTime(value) {
+      if (!value) return '—';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return String(value);
+      const parts = Object.fromEntries(new Intl.DateTimeFormat('zh-CN', {
+        timeZone: 'Asia/Shanghai', month: '2-digit', day: '2-digit', weekday: 'short',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+      }).formatToParts(parsed).map(part => [part.type, part.value]));
+      return `${parts.month}-${parts.day}（${parts.weekday}）${parts.hour}:${parts.minute}:${parts.second}`;
+    }
+    function renderResultActions(jobIds) {
+      const actions = document.getElementById('resultActions');
+      if (!jobIds.length) { actions.hidden = true; actions.innerHTML = ''; return; }
+      const params = encodeURIComponent(jobIds.join(','));
+      actions.innerHTML = `<a class="button-link" href="/api/exports/view?job_ids=${params}" target="_blank" rel="noopener">查看本次查询结果</a><a class="button-link secondary-link" href="/api/exports/xlsx?job_ids=${params}">下载本次查询 XLSX</a>`;
+      actions.hidden = false;
+    }
+    loadGroups(); loadHistory(); toggleMode();
+  </script>
+</body>
+</html>
