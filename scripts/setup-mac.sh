@@ -111,7 +111,7 @@ else
 fi
 
 command -v appium >/dev/null 2>&1 || fail "Appium 安装后仍无法找到 appium。"
-if appium driver list --installed 2>/dev/null | grep -qi 'uiautomator2'; then
+if appium driver list --installed 2>&1 | grep -qi 'uiautomator2'; then
   info "Appium UiAutomator2 驱动已安装，跳过。"
 else
   info "安装 Appium UiAutomator2 驱动。"
